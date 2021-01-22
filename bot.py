@@ -294,7 +294,6 @@ def time_last_baking():
 #         "Чото не працює..."
 
 #Cooking Post
-
 async def cooking_post(chat_id):
 #Send Message
     img = open('cookie_cooking.gif', 'rb')
