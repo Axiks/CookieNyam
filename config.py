@@ -1,0 +1,3 @@
+TOKEN = 'SECRET_TOKEN'
+START_COOKIE_COUNT = 3 #Disch
+COOKIE_COOKING_TIME = ["10:00", "18:00", "22:00"] # Cooking time
