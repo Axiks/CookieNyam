@@ -40,7 +40,7 @@ dp = Dispatcher(bot)
 async def process_start_command(message: types.Message):
     img = open('new_chat_members.png', 'rb')
     await bot.send_photo(message.chat.id, img)
-    await bot.send_message(message.chat.id, "Привіт :3\nЯ неко-тян. Люблю пекти смачні 2D печеньки.\nВласне хочу з вами ними поділитись!\nПечу їх " + str(len(COOKIE_COOKING_TIME)) + " раз на день.\nЩоб дізнатись більше про мене напишіть команду команду /help")
+    await bot.send_message(message.chat.id, "Привіт :3\nЯ неко-тян. Люблю пекти смачні 2D печеньки.\nВласне хочу з вами ними поділитись!\nПечу їх " + str(len(COOKIE_COOKING_TIME)) + " раз на день.\nЩоб дізнатись більше про мене напишіть команду /help")
 
 @dp.message_handler(commands=['nya'])
 async def process_start_command(message: types.Message):
@@ -48,7 +48,7 @@ async def process_start_command(message: types.Message):
 
 @dp.message_handler(commands=['help'])
 async def process_help_command(message: types.Message):
-    help_msg = "Я неко пекар яка любить випікати смачне печиво, а ще більше ділитись ним з оточуючими)\nДостатньо запросити мене у чат\n\nМене створив @Qweeik\n2021 v0.1.1 beta\nCode source: https://github.com/Axiks/CookieNyam"
+    help_msg = "Я неко пекар яка любить випікати смачне печиво, а ще більше ділитись ним з оточуючими)\nДостатньо запросити мене у чат\n\nМене створив @Qweeik\n2021 v0.1.1 beta\nCode source: https://github.com/Axiks/CookieNyam\nУсього спечено печення: *" + str(all_cookies_distributed()) + "*"
     await bot.send_message(message.chat.id, help_msg, parse_mode= 'Markdown')
 
 @dp.message_handler(commands=['teleport'])
@@ -151,6 +151,11 @@ async def url_go_message(chat_id, message_id):
 
 def my_cookie_count(user_id):
     cursor.execute("SELECT COUNT(*) FROM Cookie WHERE user_id=" + str(user_id))
+    count_cookie = cursor.fetchone()[0]
+    return count_cookie
+
+def all_cookies_distributed():
+    cursor.execute("SELECT COUNT(*) FROM Cookie")
     count_cookie = cursor.fetchone()[0]
     return count_cookie
 
