@@ -8,6 +8,10 @@ from aiogram.types import ReplyKeyboardRemove, \
 import asyncio
 import aioschedule
 
+import telebot
+import re
+from telebot import types
+
 import emoji
 
 import sqlite3
@@ -24,9 +28,6 @@ cursor = conn.cursor()
 inline_btn_get_cookie = InlineKeyboardButton(emoji.emojize(":cookie:") + ' Взяти', callback_data='get_btn')
 inline_btn_cooking_time = InlineKeyboardButton(emoji.emojize(":woman_cook:") + ' Розклад випічки', callback_data='timetable_btn')
 
-inline_kb = InlineKeyboardMarkup(row_width=2)
-inline_kb.insert(inline_btn_get_cookie)
-
 inline_kb_get_cookie = InlineKeyboardMarkup(row_width=2)
 inline_kb_get_cookie.insert(inline_btn_get_cookie)
 inline_kb_get_cookie.insert(inline_btn_cooking_time)
@@ -34,6 +35,8 @@ inline_kb_get_cookie.insert(inline_btn_cooking_time)
 # program
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot)
+
+botTelebot = telebot.TeleBot(TOKEN)
 
 #Command cmd
 @dp.message_handler(commands=['start'])
@@ -48,7 +51,7 @@ async def process_start_command(message: types.Message):
 
 @dp.message_handler(commands=['help'])
 async def process_help_command(message: types.Message):
-    help_msg = "Я неко пекар яка любить випікати смачне печиво, а ще більше ділитись ним з оточуючими)\nДостатньо запросити мене у чат\n\nМене створив @Qweeik\n2021 v0.1.1 beta\nCode source: https://github.com/Axiks/CookieNyam\nУсього спечено печення: *" + str(all_cookies_distributed()) + "*"
+    help_msg = "Я неко пекар яка любить випікати смачне печиво, а ще більше ділитись ним з оточуючими)\nДостатньо запросити мене у чат\n\nМене створив @Qweeik\n2021 v0.1.1 beta\nCode source: https://github.com/Axiks/CookieNyam\nУсього спечено печення: *" + str(all_cookies_distributed()) + "*\nУсього користувачів що взяли печення: *" + str(all_users_uses()) + "*"
     await bot.send_message(message.chat.id, help_msg, parse_mode= 'Markdown')
 
 @dp.message_handler(commands=['teleport'])
@@ -84,6 +87,20 @@ async def process_start_command(callback_query: types.CallbackQuery):
     for cookie_time in COOKIE_COOKING_TIME:
         timetable = timetable + " - " + str(cookie_time) + "\n"
     await bot.answer_callback_query(callback_query_id=callback_query.id, show_alert=True, text=timetable)
+
+@dp.inline_handler(lambda callback_query: True)
+def inline_mode(callback_query):
+    capibara1 = types.InlineQueryResultCachedPhoto(
+        id="1",
+        photo_file_id="AgADAgAD6rMxGyBnGwABgBmcoHgy01IENAAQSYK_1gyoAAU-5aQACAg",
+        caption="Это капибара №1"
+    )
+    capibara2 = types.InlineQueryResultCachedPhoto(
+        id="2",
+        photo_file_id="AgADAgAD67MxGyBnGwABCvqPIYxMoNHENAAS51HjO88y_Z0ffAQABAg",
+        caption="Это капибара №2"
+    )
+    bot.answer_inline_query(callback_query.id, [capibara1, capibara2])
 
 @dp.callback_query_handler(lambda callback_query: True)
 async def callback_inline(callback_query):
@@ -156,6 +173,11 @@ def my_cookie_count(user_id):
 
 def all_cookies_distributed():
     cursor.execute("SELECT COUNT(*) FROM Cookie")
+    count_cookie = cursor.fetchone()[0]
+    return count_cookie
+
+def all_users_uses():
+    cursor.execute("SELECT COUNT(DISTINCT user_id) FROM Cookie")
     count_cookie = cursor.fetchone()[0]
     return count_cookie
 
