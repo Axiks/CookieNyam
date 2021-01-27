@@ -51,7 +51,7 @@ async def process_start_command(message: types.Message):
 
 @dp.message_handler(commands=['help'])
 async def process_help_command(message: types.Message):
-    help_msg = "Я неко пекар яка любить випікати смачне печиво, а ще більше ділитись ним з оточуючими)\nДостатньо запросити мене у чат\n\nМене створив @Qweeik\n2021 v0.1.1 beta\nCode source: https://github.com/Axiks/CookieNyam\nУсього спечено печення: *" + str(all_cookies_distributed()) + "*\nУсього користувачів що взяли печення: *" + str(all_users_uses()) + "*"
+    help_msg = "Я неко пекар яка любить випікати смачне печиво, а ще більше ділитись ним з оточуючими)\nДостатньо запросити мене у чат\n\nМене створив @Qweeik\n2021 v0.1.1 beta\nCode source: https://github.com/Axiks/CookieNyam\nУсього спечено печення: *" + str(all_cookies_distributed()) + "*\nУсього користувачів що взяли печення: *" + str(all_users_uses()) + "*\nВипікаю печення для: *" + str(all_chat_uses()) + "* чатів"
     await bot.send_message(message.chat.id, help_msg, parse_mode= 'Markdown')
 
 @dp.message_handler(commands=['teleport'])
@@ -178,6 +178,11 @@ def all_cookies_distributed():
 
 def all_users_uses():
     cursor.execute("SELECT COUNT(DISTINCT user_id) FROM Cookie")
+    count_cookie = cursor.fetchone()[0]
+    return count_cookie
+
+def all_chat_uses():
+    cursor.execute("SELECT COUNT(DISTINCT chat_id) FROM Cookie")
     count_cookie = cursor.fetchone()[0]
     return count_cookie
 
