@@ -51,6 +51,17 @@ async def process_help_command(message: types.Message):
 async def process_nya_command(message: types.Message):
     await bot.send_message(message.chat.id, "Nya nya :3")
 
+@dp.message_handler(commands=['transfer'])
+async def process_nya_command(message: types.Message):
+    amount = 2
+    nekoA = Shopper(message.from_user.id)
+    nekoB = Shopper(472737067)
+    status = await transfer_cookie(nekoA.getId(), nekoB.getId(), amount, message.chat.id)
+    print("Transfer status: " + str(status))
+    await bot.send_message(message.chat.id, nekoA.getName() + " дав " + nekoB.getName() + " " + str(amount) + " печив.")
+    await bot.send_message(message.chat.id, nekoA.getName() + " має " + str(nekoA.cookieCountAll()) + " печива.\n" + nekoB.getName() + " тепер має " + str(nekoB.cookieCountAll()) + " печива.\n")
+
+
 @dp.message_handler(commands=['teleport'])
 async def process_teleport_command(message: types.Message):
     nekoBaker = Baker(message.chat.id, COOKIE_COOKING_TIME)
@@ -124,19 +135,39 @@ async def url_go_message(chat_id, message_id):
     url = "https://t.me/" + str(chat_id) + "/" + str(message_id)
     return url
 
+#Money
+async def transfer_cookie(from_neko_id, in_neko_id, amount, chat_id):
+    nekoA = Shopper(from_neko_id)
+    if(nekoA.cookieCountAll() >= amount):
+        #Delete cookie Neko A
+        now = datetime.now()
+        dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+        cursor.execute("insert into Cookie values (" + str(nekoA.getId()) + ", '" + str(nekoA.getName()) + "', '-" + str(amount) + "', " + str(chat_id) + ', "'  + dt_string + '")')
+        conn.commit()
+        #Delete cookie Neko B
+        nekoB = Shopper(in_neko_id)
+        now = datetime.now()
+        dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+        cursor.execute("insert into Cookie values (" + str(nekoB.getId()) + ", '" + str(nekoB.getName()) + "', '" + str(amount) + "', " + str(chat_id) + ', "'  + dt_string + '")')
+        conn.commit()
+        return True
+    else:
+        print("Не достатньо печеньок для відправки")
+        return False
+
+
 #Render
 def renderGetCookieUsers(chat_id):
     text = "Печеньки готові :3\n\nПеченьку взяв:\n"
     nekoBaker = Baker(chat_id, COOKIE_COOKING_TIME)
     date_last_baking_cookie = nekoBaker.last_baking().strftime("%d/%m/%Y %H:%M:%S")
     #When user get last cookie? + FIX
-    cursor.execute("SELECT user_id, user_name, get_data FROM Cookie WHERE chat_id=" + str(chat_id) + ' AND get_data >= "' + str(date_last_baking_cookie) + '" ORDER BY get_data DESC')
+    cursor.execute("SELECT DISTINCT user_id FROM Cookie WHERE chat_id=" + str(chat_id) + ' AND get_data >= "' + str(date_last_baking_cookie) + '" ORDER BY get_data DESC')
     cookies = cursor.fetchall()
     for cookie in cookies:
         user_id = cookie[0]
-        user_name = cookie[1]
         user = Shopper(user_id)
-        text = text + "+1 *" + str(user_name) + "* має тепер " + str(user.cookieCountAll()) + " печеньок\n"
+        text = text + "+1 *" + str(user.getName()) + "* має тепер " + str(user.cookieCountAll()) + " печеньок\n"
     return text
 
 #Cooking Post

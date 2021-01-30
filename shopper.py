@@ -22,9 +22,13 @@ class Shopper:
 
 # Усього печеньок
   def cookieCountAll(self):
+    balance = 0
     conn = sqlite3.connect('cookie.sqlite')
     cursor = conn.cursor()
-    cursor.execute("SELECT COUNT(*) FROM Cookie WHERE user_id=" + str(self.__user_id))
-    count_cookie = cursor.fetchone()[0]
+    cursor.execute("SELECT balance FROM Cookie WHERE user_id=" + str(self.__user_id))
+    cookies = cursor.fetchall()
+    for cookie in cookies:
+        transaction = int(cookie[0])
+        balance += transaction
     conn.close()
-    return count_cookie
+    return balance
