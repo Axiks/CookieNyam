@@ -10,7 +10,7 @@ import emoji
 import sqlite3
 from datetime import datetime, timedelta
 
-from config.config import TOKEN, COOKIE_COOKING_TIME, DATABASE_PATH
+from config.config import TOKEN, COOKIE_COOKING_TIME, DATABASE_PATH, VERSION
 from shopper import Shopper
 from baker import Baker
 from statistic import Statistic
@@ -34,28 +34,37 @@ inline_kb_get_cookie.insert(inline_btn_cooking_time)
 #Command cmd
 @dp.message_handler(commands=['start'])
 async def process_start_command(message: types.Message):
-    img = open('new_chat_members.png', 'rb')
+    img = open('src/new_chat_members.png', 'rb')
     await bot.send_photo(message.chat.id, img)
     await bot.send_message(message.chat.id, "Привіт :3\nЯ неко-тян. Люблю пекти смачні 2D печеньки.\nВласне хочу з вами ними поділитись!\nПечу їх " + str(len(COOKIE_COOKING_TIME)) + " раз на день.\nЩоб дізнатись більше про мене напишіть команду /help")
 
 @dp.message_handler(commands=['help'])
 async def process_help_command(message: types.Message):
-    help_msg = "Я неко пекар яка любить випікати смачне печиво, а ще більше ділитись ним з оточуючими)\nДостатньо запросити мене у чат\n\nМене створив @Qweeik\n2021 v0.1.1 beta\nCode source: https://github.com/Axiks/CookieNyam\nУсього спечено печення: *" + str(Statistic.all_cookies_distributed()) + "*\nУсього користувачів що взяли печення: *" + str(Statistic.all_users_uses()) + "*\nВипікаю печення для: *" + str(Statistic.all_chat_uses()) + "* чатів"
+    help_msg = "Я неко пекар яка любить випікати смачне печиво, а ще більше ділитись ним з оточуючими)\nДостатньо запросити мене у чат\nЩоб дізнатись мої команди напиши /commands \n\nМене створив @Qweeik\n2021 {0}\nCode source: https://github.com/Axiks/CookieNyam\nУсього спечено печення: *".format(VERSION) + str(Statistic.all_cookies_distributed()) + "*\nУсього користувачів що взяли печення: *" + str(Statistic.all_users_uses()) + "*\nВипікаю печення для: *" + str(Statistic.all_chat_uses()) + "* чатів"
     await bot.send_message(message.chat.id, help_msg, parse_mode= 'Markdown')
 
 @dp.message_handler(commands=['nya'])
 async def process_nya_command(message: types.Message):
     await bot.send_message(message.chat.id, "Nya nya :3")
 
-@dp.message_handler(commands=['transfer'])
+@dp.message_handler(commands=['commands'])
 async def process_nya_command(message: types.Message):
-    amount = 2
-    nekoA = Shopper(message.from_user.id)
-    nekoB = Shopper(472737067)
-    status = await transfer_cookie(nekoA.getId(), nekoB.getId(), amount, message.chat.id)
-    print("Transfer status: " + str(status))
-    await bot.send_message(message.chat.id, nekoA.getName() + " дав " + nekoB.getName() + " " + str(amount) + " печив.")
-    await bot.send_message(message.chat.id, nekoA.getName() + " має " + str(nekoA.cookieCountAll()) + " печива.\n" + nekoB.getName() + " тепер має " + str(nekoB.cookieCountAll()) + " печива.\n")
+    commands_msg ="""
+    /start - запускає мене\n
+    /teleport - переміщую тебе ближче до смаколиків\n
+    /help - нюю.. Розказую хто я і хто мій засновни. А ще можеш побачити мене без печенюшок на GitHub ~
+    """;
+    await bot.send_message(message.chat.id, commands_msg)
+
+# @dp.message_handler(commands=['transfer'])
+# async def process_nya_command(message: types.Message):
+#     amount = 2
+#     nekoA = Shopper(message.from_user.id)
+#     nekoB = Shopper(472737067)
+#     status = await transfer_cookie(nekoA.getId(), nekoB.getId(), amount, message.chat.id)
+#     print("Transfer status: " + str(status))
+#     await bot.send_message(message.chat.id, nekoA.getName() + " дав " + nekoB.getName() + " " + str(amount) + " печив.")
+#     await bot.send_message(message.chat.id, nekoA.getName() + " має " + str(nekoA.cookieCountAll()) + " печива.\n" + nekoB.getName() + " тепер має " + str(nekoB.cookieCountAll()) + " печива.\n")
 
 
 @dp.message_handler(commands=['teleport'])
@@ -76,7 +85,7 @@ async def process_teleport_command(message: types.Message):
 async def new_chat(message: types.Message):
     for user in message.new_chat_members:
         if user.id == bot.id:
-            img = open('new_chat_members.png', 'rb')
+            img = open('src/new_chat_members.png', 'rb')
             await bot.send_photo(message.chat.id, img)
             await bot.send_message(message.chat.id, "Привіт :3\nЯ неко-тян. Люблю пекти смачні 2D печеньки.\nВласне хочу з вами ними поділитись!\nПечу їх " + str(len(COOKIE_COOKING_TIME)) + " раз на день.")
             new_chat_add(message.chat.id)
@@ -84,7 +93,7 @@ async def new_chat(message: types.Message):
             await cooking_post(message.chat.id)
             return
 
-#Inline
+#Inline (Кнопки)
 @dp.callback_query_handler(lambda c: c.data == 'timetable_btn')
 async def process_start_command(callback_query: types.CallbackQuery):
     timetable = "Неко тян готує їх " + str(len(COOKIE_COOKING_TIME)) + " раз на день.\n\nРозклад\n"
@@ -132,24 +141,24 @@ async def url_go_message(chat_id, message_id):
     return url
 
 #Money
-async def transfer_cookie(from_neko_id, in_neko_id, amount, chat_id):
-    nekoA = Shopper(from_neko_id)
-    if(nekoA.cookieCountAll() >= amount):
-        #Delete cookie Neko A
-        now = datetime.now()
-        dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
-        cursor.execute("insert into Cookie values (" + str(nekoA.getId()) + ", '" + str(nekoA.getName()) + "', '-" + str(amount) + "', " + str(chat_id) + ', "'  + dt_string + '")')
-        conn.commit()
-        #Delete cookie Neko B
-        nekoB = Shopper(in_neko_id)
-        now = datetime.now()
-        dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
-        cursor.execute("insert into Cookie values (" + str(nekoB.getId()) + ", '" + str(nekoB.getName()) + "', '" + str(amount) + "', " + str(chat_id) + ', "'  + dt_string + '")')
-        conn.commit()
-        return True
-    else:
-        print("Не достатньо печеньок для відправки")
-        return False
+# async def transfer_cookie(from_neko_id, in_neko_id, amount, chat_id):
+#     nekoA = Shopper(from_neko_id)
+#     if(nekoA.cookieCountAll() >= amount):
+#         #Delete cookie Neko A
+#         now = datetime.now()
+#         dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+#         cursor.execute("insert into Cookie values (" + str(nekoA.getId()) + ", '" + str(nekoA.getName()) + "', '-" + str(amount) + "', " + str(chat_id) + ', "'  + dt_string + '")')
+#         conn.commit()
+#         #Delete cookie Neko B
+#         nekoB = Shopper(in_neko_id)
+#         now = datetime.now()
+#         dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+#         cursor.execute("insert into Cookie values (" + str(nekoB.getId()) + ", '" + str(nekoB.getName()) + "', '" + str(amount) + "', " + str(chat_id) + ', "'  + dt_string + '")')
+#         conn.commit()
+#         return True
+#     else:
+#         print("Не достатньо печеньок для відправки")
+#         return False
 
 
 #Render
@@ -168,7 +177,7 @@ def renderGetCookieUsers(chat_id):
 
 #Cooking Post
 async def cooking_post(chat_id):
-    img = open('cookie_cooking.gif', 'rb')
+    img = open('src/cookie_cooking.gif', 'rb')
     try:
         await bot.send_animation(chat_id, img, 10)
         message_obj = await bot.send_message(chat_id, "Печеньки готові :3", reply_markup=inline_kb_get_cookie)

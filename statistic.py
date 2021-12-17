@@ -18,7 +18,7 @@ class Statistic:
         conn.close()
         return count_cookie
 
-    def all_chat_uses(self):
+    def all_chat_uses():
         conn = sqlite3.connect(DATABASE_PATH)
         cursor = conn.cursor()
         cursor.execute("SELECT COUNT(DISTINCT chat_id) FROM Cookie")

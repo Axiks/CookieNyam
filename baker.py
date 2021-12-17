@@ -1,6 +1,7 @@
 import sqlite3
 from datetime import datetime, timedelta
 from shopper import Shopper
+from config.config import DATABASE_PATH
 
 class Baker:
     def __init__(self, chat_id, cooking_time):
@@ -9,7 +10,7 @@ class Baker:
 
     # Просити печеньки
     def get_cookie(self, user_id, user_name):
-        conn = sqlite3.connect('cookie.sqlite')
+        conn = sqlite3.connect(DATABASE_PATH)
         cursor = conn.cursor()
         #When user get last cookie? + FIX
         cursor.execute("SELECT get_data FROM Cookie WHERE chat_id=" + str(self._chat_id) + ' AND user_id=' + str(user_id) + ' ORDER BY get_data DESC LIMIT 1')
@@ -65,7 +66,7 @@ class Baker:
 
         # Id повідомлення про останнє випікання
     def last_baking_message_id(self):
-        conn = sqlite3.connect('cookie.sqlite')
+        conn = sqlite3.connect(DATABASE_PATH)
         cursor = conn.cursor()
         cursor.execute("SELECT message_id FROM Chat WHERE chat_id=" + str(self._chat_id) + " ORDER BY message_id DESC LIMIT 1")
         chat = cursor.fetchone()
