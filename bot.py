@@ -4,23 +4,19 @@ from aiogram.utils import executor
 from aiogram.types import ReplyKeyboardRemove, \
     ReplyKeyboardMarkup, KeyboardButton, \
     InlineKeyboardMarkup, InlineKeyboardButton
-
 import asyncio
 import aioschedule
-
 import emoji
-
 import sqlite3
-
 from datetime import datetime, timedelta
 
-from config import TOKEN, COOKIE_COOKING_TIME
+from config.config import TOKEN, COOKIE_COOKING_TIME, DATABASE_PATH
 from shopper import Shopper
 from baker import Baker
 from statistic import Statistic
 
 # sqlite
-conn = sqlite3.connect('cookie.sqlite')
+conn = sqlite3.connect(DATABASE_PATH)
 cursor = conn.cursor()
 
 # program
