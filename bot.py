@@ -34,7 +34,7 @@ inline_kb_get_cookie.insert(inline_btn_cooking_time)
 #Command cmd
 @dp.message_handler(commands=['start'])
 async def process_start_command(message: types.Message):
-    img = open('src/new_chat_members.png', 'rb')
+    img = open('src\\new_chat_members.png', 'rb')
     await bot.send_photo(message.chat.id, img)
     await bot.send_message(message.chat.id, "Привіт :3\nЯ неко-тян. Люблю пекти смачні 2D печеньки.\nВласне хочу з вами ними поділитись!\nПечу їх " + str(len(COOKIE_COOKING_TIME)) + " раз на день.\nЩоб дізнатись більше про мене напишіть команду /help")
 
@@ -85,7 +85,7 @@ async def process_teleport_command(message: types.Message):
 async def new_chat(message: types.Message):
     for user in message.new_chat_members:
         if user.id == bot.id:
-            img = open('src/new_chat_members.png', 'rb')
+            img = open('src\\new_chat_members.png', 'rb')
             await bot.send_photo(message.chat.id, img)
             await bot.send_message(message.chat.id, "Привіт :3\nЯ неко-тян. Люблю пекти смачні 2D печеньки.\nВласне хочу з вами ними поділитись!\nПечу їх " + str(len(COOKIE_COOKING_TIME)) + " раз на день.")
             new_chat_add(message.chat.id)
@@ -177,7 +177,7 @@ def renderGetCookieUsers(chat_id):
 
 #Cooking Post
 async def cooking_post(chat_id):
-    img = open('src/cookie_cooking.gif', 'rb')
+    img = open('src\\cookie_cooking.gif', 'rb')
     try:
         await bot.send_animation(chat_id, img, 10)
         message_obj = await bot.send_message(chat_id, "Печеньки готові :3", reply_markup=inline_kb_get_cookie)
