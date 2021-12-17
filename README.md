@@ -22,5 +22,11 @@ Change your token to a configuration file 'config.py':
 TOKEN = 'YOUR_SECRET_TOKEN'
 ```
 
+## Run
+Use the package manager [pip](https://pip.pypa.io/en/stable/) to install foobar.
+```bash
+python bot.py
+```
+
 ## License
 [GNU](https://www.gnu.org/licenses/quick-guide-gplv3.html)
