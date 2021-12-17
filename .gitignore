@@ -1,2 +1,3 @@
-cookie.sqlite
-config.py
+database/cookie.sqlite
+config/config.py
+config/__pycache__

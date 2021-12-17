@@ -17,9 +17,15 @@ pip install aioschedule
 pip install emoji
 ```
 ## Configuration
-Change your token to a configuration file 'config.py':
+Change your token to a configuration file 'config/config.py':
 ```
 TOKEN = 'YOUR_SECRET_TOKEN'
+```
+
+## Run
+Use the package manager [pip](https://pip.pypa.io/en/stable/) to install foobar.
+```bash
+python bot.py
 ```
 
 ## License
