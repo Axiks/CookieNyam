@@ -34,7 +34,7 @@ inline_kb_get_cookie.insert(inline_btn_cooking_time)
 #Command cmd
 @dp.message_handler(commands=['start'])
 async def process_start_command(message: types.Message):
-    img = open('src\\new_chat_members.png', 'rb')
+    img = open('src/new_chat_members.png', 'rb')
     await bot.send_photo(message.chat.id, img)
     await bot.send_message(message.chat.id, "Привіт :3\nЯ неко-тян. Люблю пекти смачні 2D печеньки.\nВласне хочу з вами ними поділитись!\nПечу їх " + str(len(COOKIE_COOKING_TIME)) + " раз на день.\nЩоб дізнатись більше про мене напишіть команду /help")
 
@@ -70,12 +70,16 @@ async def process_nya_command(message: types.Message):
 @dp.message_handler(commands=['teleport'])
 async def process_teleport_command(message: types.Message):
     nekoBaker = Baker(message.chat.id, COOKIE_COOKING_TIME)
-    message_id = nekoBaker.last_baking_message_id
+    message_id = nekoBaker.last_baking_message_id()
+    print("D Message id: " + str(message_id))
     if message_id is not None:
         if message.chat.username is not None:
             # keyboard
             inline_kb_tl = InlineKeyboardMarkup(row_width=1)
             inline_btn_teleport = InlineKeyboardButton('Телепортуватись!', url= await url_go_message(message.chat.username , message_id))
+            print("Chat username: " + message.chat.username)
+            print("Message id: " + str(message_id))
+            # inline_btn_teleport = InlineKeyboardButton('Телепортуватись!', url= "https://www.google.com.ua/")
             inline_kb_tl.insert(inline_btn_teleport)
             await bot.send_message(message.chat.id, "Ти викликав О великий І могутній телепорт", reply_markup=inline_kb_tl)
         else:
@@ -85,7 +89,7 @@ async def process_teleport_command(message: types.Message):
 async def new_chat(message: types.Message):
     for user in message.new_chat_members:
         if user.id == bot.id:
-            img = open('src\\new_chat_members.png', 'rb')
+            img = open('src/new_chat_members.png', 'rb')
             await bot.send_photo(message.chat.id, img)
             await bot.send_message(message.chat.id, "Привіт :3\nЯ неко-тян. Люблю пекти смачні 2D печеньки.\nВласне хочу з вами ними поділитись!\nПечу їх " + str(len(COOKIE_COOKING_TIME)) + " раз на день.")
             new_chat_add(message.chat.id)
@@ -165,6 +169,7 @@ async def url_go_message(chat_id, message_id):
 def renderGetCookieUsers(chat_id):
     text = "Печеньки готові :3\n\nПеченьку взяв:\n"
     nekoBaker = Baker(chat_id, COOKIE_COOKING_TIME)
+    ### T
     date_last_baking_cookie = nekoBaker.last_baking().strftime("%d/%m/%Y %H:%M:%S")
     #When user get last cookie? + FIX
     cursor.execute("SELECT DISTINCT user_id FROM Cookie WHERE chat_id=" + str(chat_id) + ' AND get_data >= "' + str(date_last_baking_cookie) + '" ORDER BY get_data DESC')
@@ -177,7 +182,7 @@ def renderGetCookieUsers(chat_id):
 
 #Cooking Post
 async def cooking_post(chat_id):
-    img = open('src\\cookie_cooking.gif', 'rb')
+    img = open('src/cookie_cooking.gif', 'rb')
     try:
         await bot.send_animation(chat_id, img, 10)
         message_obj = await bot.send_message(chat_id, "Печеньки готові :3", reply_markup=inline_kb_get_cookie)
